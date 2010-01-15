@@ -1,0 +1,28 @@
+JAVA_CLASSPATH="xalan.jar:xercesImpl.jar:serializer.jar"
+SVN_URI="http://svn.apache.org/repos/asf/xml/stylebook/trunk"
+inherit ant svn
+
+DESCRIPTION="Java XML website authoring tool"
+HOMEPAGE="http://xml.apache.org/"
+
+DISTCLEANFILES="bin/*.jar"
+
+src_compile() {
+	lndirs
+	cd ${B}
+	cygant
+
+	# ImagePrinter.java requires com.sun.image.codec.jpeg
+	# XalanProcessor.java is for the xalan1 backend
+	${JAVADOC} -d build/javadoc \
+		$(find src/ -name '*.java' ! -name ImagePrinter.java ! -name XalanProcessor.java)
+}
+
+src_install() {
+	cd ${B}
+	dojar bin/stylebook*.jar
+	dojavadoc build/javadoc
+
+	dodir /usr/share/stylebook
+	cp -r ${S}/styles ${D}/usr/share/stylebook/
+}
